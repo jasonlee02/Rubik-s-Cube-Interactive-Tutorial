@@ -1,10 +1,12 @@
 import './App.css';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import {BrowserRouter as Router, Route} from "react-router-dom";
+import Cube from "./components/cube.component"
 
 function App() {
   return (
-    <div className="App">
-      Hello
-    </div>
+    <Cube></Cube>
   );
 }
 

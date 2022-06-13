@@ -15,4 +15,6 @@ router.route('/add').post((req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 })
 
+//write in delete and update routers
+
 module.exports = router;
