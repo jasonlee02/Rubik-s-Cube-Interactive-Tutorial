@@ -11,3 +11,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+/*put in the vertical middle of the root div*/
+.cubeelement{
+  position: absolute;
+  width: 50vw;
+  height: 50vw;
+  top: 50%;
+  transform: translate(0, -50%);
+}
+
+#root{
+  height: 100vh;
+}

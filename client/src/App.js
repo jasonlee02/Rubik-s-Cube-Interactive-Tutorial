@@ -1,12 +1,19 @@
-import './App.css';
 import React from 'react';
-import ReactDOM from 'react-dom/client';
 import {BrowserRouter as Router, Route} from "react-router-dom";
-import Cube from "./components/cube.component"
+import Cube from "./components/cube.component";
+import './components/cube.component.css';
+import TestCube from "./testing/testcubecontainer";
 
 function App() {
   return (
-    <Cube></Cube>
+    <div className = "cubeelement">
+        <Cube 
+        cubeState = {[
+          [0, 1, 3, 5, 5, 4],
+          [7, 0, 3, 5, 4, 6]
+        ]}
+        />
+    </div>
   );
 }
 
