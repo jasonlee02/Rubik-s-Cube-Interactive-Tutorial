@@ -1,22 +1,43 @@
 import React from 'react';
-import { Canvas } from '@react-three/fiber';
-import {OrbitControls} from '@react-three/drei';
+import { Canvas } from '@react-three/fiber/';
+import {OrbitControls} from '@react-three/drei/';
+
+const cubieSize = 1;
+const distancingConstant = 1.1;
+const distanceCubies = (element) => {
+    return element * distancingConstant * cubieSize;
+}
 
 export default function Cube(props){
     return(
         <Canvas>
-            <Cubie coloring = {props.cubeState[0]}/>
-            <OrbitControls />
-            <ambientLight intensity = {0.5}/>
+            <OrbitControls 
+                enablePan = {false}/>
+            <ambientLight intensity = {1}/>
+            {getCubieList(props)}
         </Canvas>
     )
 }
 
+function getCubieList(props){
+    let CubieArray = [];
+    for (let x = -1; x <= 1; x++){
+        for (let y = 1; y >= -1; y--){
+            for (let z = -1; z <= 1; z++){
+                const cubieNum = (x + 1) * 9 + (-y + 1) * 3 + (z + 1);
+                CubieArray.push(<Cubie coloring = {props.cubeState[cubieNum]} position = {[x, y, z].map(distanceCubies)} key = {cubieNum}/>)
+            }
+        }
+    }
+    return CubieArray;
+}
+
 function Cubie(props){
-    //const getMaterial = this.getMaterial.bind(this);
+    //color order: right, left, top, bottom, front, back
     return(
-        <mesh>
-            <boxBufferGeometry attach = "geometry" args = {[1, 1, 1]}/>
+        <mesh
+            position = {props.position}>
+            <boxBufferGeometry attach = "geometry" args = {[cubieSize, cubieSize, cubieSize]}/>
             <meshStandardMaterial color = {colors[props.coloring[0]]} attach = {"material-0"}/>
             <meshStandardMaterial color = {colors[props.coloring[1]]} attach = {"material-1"}/>
             <meshStandardMaterial color = {colors[props.coloring[2]]} attach = {"material-2"}/>
@@ -29,9 +50,9 @@ function Cubie(props){
 //colors: white, red, blue, orange, green, yellow, black
 const colors = 
     ["#FFFFFF", 
-    "#C41E3A", 
-    "#0051BA", 
-    "#FF5800", 
-    "#009E60", 
-    "#FFD500", 
+    "#FF0000", 
+    "#0000FF", 
+    "#FF9500", 
+    "#00FF00", 
+    "#FFFF00", 
     "#000000"];
