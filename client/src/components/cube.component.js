@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber/';
 import {OrbitControls} from '@react-three/drei/';
 
 const cubieSize = 1;
-const distancingConstant = 1.1;
+const distancingConstant = 1.05;
 const distanceCubies = (element) => {
     return element * distancingConstant * cubieSize;
 }
