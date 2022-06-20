@@ -1,6 +1,7 @@
-import React from 'react';
-import { Canvas } from '@react-three/fiber/';
-import {OrbitControls} from '@react-three/drei/';
+import React, {useRef, useEffect} from 'react';
+import {Canvas, useUpdate, useFrame, useThree} from '@react-three/fiber/';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
+import * as THREE from 'three';
 
 const cubieSize = 1;
 const distancingConstant = 1.05;
@@ -11,8 +12,7 @@ const distanceCubies = (element) => {
 export default function Cube(props){
     return(
         <Canvas>
-            <OrbitControls 
-                enablePan = {false}/>
+            <CameraController />
             <ambientLight intensity = {1}/>
             {getCubieList(props)}
         </Canvas>
@@ -24,14 +24,14 @@ function getCubieList(props){
     for (let x = -1; x <= 1; x++){
         for (let y = 1; y >= -1; y--){
             for (let z = -1; z <= 1; z++){
+                //labels the cubies 0-26
                 const cubieNum = (x + 1) * 9 + (-y + 1) * 3 + (z + 1);
-                CubieArray.push(<Cubie coloring = {props.cubeState[cubieNum]} position = {[x, y, z].map(distanceCubies)} key = {cubieNum}/>)
+                CubieArray.push(<Cubie coloring = {props.cubeState[cubieNum]} position = {[x, y, z].map(distanceCubies)} key = {[x, y, z]}/>)
             }
         }
     }
     return CubieArray;
 }
-
 function Cubie(props){
     //color order: right, left, top, bottom, front, back
     return(
@@ -56,3 +56,23 @@ const colors =
     "#00FF00", 
     "#FFFF00", 
     "#000000"];
+
+function move(axis, direction, layer){
+    
+}
+
+const CameraController = () => {
+    const { camera, gl } = useThree();
+    useEffect(
+       () => {
+          const controls = new OrbitControls(camera, gl.domElement);
+          controls.enablePan = false;
+          controls.mouseButtons = {RIGHT: THREE.MOUSE.ROTATE};
+          return () => {
+            controls.dispose();
+          };
+       },
+       [camera, gl]
+    );
+    return null;
+ };

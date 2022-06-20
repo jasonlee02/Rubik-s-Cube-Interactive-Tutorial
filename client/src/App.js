@@ -2,7 +2,6 @@ import React from 'react';
 import {BrowserRouter as Router, Route} from "react-router-dom";
 import Cube from "./components/cube.component";
 import './components/cube.component.css';
-import TestCube from "./testing/testcubecontainer";
 
 function App() {
   //color order: right, left, top, bottom, front, back
