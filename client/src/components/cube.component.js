@@ -6,6 +6,7 @@ import * as THREE from 'three';
 const cubieSize = 1;
 const distancingConstant = 1.05;
 const rotationSteps = 100;
+const rotationSpeed = (Math.PI / 2) / rotationSteps;
 const distanceCubies = (element) => {
     return element * distancingConstant * cubieSize;
 }
@@ -29,7 +30,7 @@ function getCubieList(props){
                 const cubieNum = (x + 1) * 9 + (-y + 1) * 3 + (z + 1);
                 //push to array for rendering and for turn logic
                 CubieArray.push(<Cubie coloring = {props.cubeState[cubieNum]} position = {[x, y, z].map(distanceCubies)} key = {cubieNum} cubieNum = {cubieNum}/>)
-                currentTurn.push([[x, y, z], 1]);
+                currentTurn.push([[x, y, z], 0]);
             }
         }
     }
@@ -37,73 +38,92 @@ function getCubieList(props){
 }
 function Cubie(props){
     const index = props.cubieNum;
-    const mesh = React.useRef();
+    const group = React.useRef();
+    let originalRotationX = 0;
+    let originalRotationY = 0;
+    let originalRotationZ = 0;
     useFrame(() => {
         //get index to find the current turn
         switch(currentTurn[index][1]){
             case 0:
                 break;
-            case 1: 
-                mesh.current.rotation.x += (Math.PI / 2) / rotationSteps;
-                //mesh.current.position.x
+            case 1:
+                group.current.rotation.x += rotationSpeed;
                 //when turn is complete, reset the current rotation and tell currentTurn that the cubie is no longer turning 
-                if (currentRotation === Math.PI / 2){
+                if (currentRotation >= Math.PI / 2){
                     currentRotation = 0;
                     currentTurn[index][1] = 0;
+                    group.current.rotation.x = (Math.PI / 2) + originalRotationX;
+                    originalRotationX = group.current.rotation.x;
                 }
                 else{
-                    currentRotation = currentRotation + (Math.PI / 2) / rotationSteps;
+                    currentRotation += rotationSpeed;
                 }
                 break;
             case 2:
-                mesh.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), -Math.PI / (2 * rotationSteps));
-                if (currentRotation === Math.PI / 2){
+                group.current.rotation.x -= rotationSpeed;
+                //when turn is complete, reset the current rotation and tell currentTurn that the cubie is no longer turning 
+                if (currentRotation >= Math.PI / 2){
                     currentRotation = 0;
                     currentTurn[index][1] = 0;
+                    group.current.rotation.x = -(Math.PI / 2) + originalRotationX;
+                    originalRotationX = group.current.rotation.x;
                 }
                 else{
-                    currentRotation = currentRotation + Math.PI / (2 * rotationSteps);
+                    currentRotation += rotationSpeed;
                 }
                 break;
             case 3:
-                mesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.PI / (2 * rotationSteps));
-                if (currentRotation === Math.PI / 2){
+                group.current.rotation.y += rotationSpeed;
+                //when turn is complete, reset the current rotation and tell currentTurn that the cubie is no longer turning 
+                if (currentRotation >= Math.PI / 2){
                     currentRotation = 0;
                     currentTurn[index][1] = 0;
+                    group.current.rotation.y = (Math.PI / 2) + originalRotationY;
+                    originalRotationY = group.current.rotation.y;
                 }
                 else{
-                    currentRotation = currentRotation + Math.PI / (2 * rotationSteps);
+                    currentRotation += rotationSpeed;
                 }
                 break;
             case 4:
-                mesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), -Math.PI / (2 * rotationSteps));
-                if (currentRotation === Math.PI / 2){
+                group.current.rotation.y -= rotationSpeed;
+                //when turn is complete, reset the current rotation and tell currentTurn that the cubie is no longer turning 
+                if (currentRotation >= Math.PI / 2){
                     currentRotation = 0;
                     currentTurn[index][1] = 0;
+                    group.current.rotation.y = -(Math.PI / 2) + originalRotationY;
+                    originalRotationY = group.current.rotation.y;
                 }
                 else{
-                    currentRotation = currentRotation + Math.PI / (2 * rotationSteps);
+                    currentRotation += rotationSpeed;
                 }
                 break;
             case 5:
-                mesh.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), Math.PI / (2 * rotationSteps));
-                if (currentRotation === Math.PI / 2){
+                group.current.rotation.z += rotationSpeed;
+                //when turn is complete, reset the current rotation and tell currentTurn that the cubie is no longer turning 
+                if (currentRotation >= Math.PI / 2){
                     currentRotation = 0;
                     currentTurn[index][1] = 0;
+                    group.current.rotation.z = (Math.PI / 2) + originalRotationZ;
+                    originalRotationZ = group.current.rotation.z;
                 }
                 else{
-                    currentRotation = currentRotation + Math.PI / (2 * rotationSteps);
+                    currentRotation += rotationSpeed;
                 }
                 break;
             case 6:
-                mesh.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), -Math.PI / (2 * rotationSteps));
-                if (currentRotation === Math.PI / 2){
+                group.current.rotation.z -= rotationSpeed;
+                //when turn is complete, reset the current rotation and tell currentTurn that the cubie is no longer turning 
+                if (currentRotation >= Math.PI / 2){
                     currentRotation = 0;
                     currentTurn[index][1] = 0;
+                    group.current.rotation.z = -(Math.PI / 2) + originalRotationZ;
+                    originalRotationZ = group.current.rotation.z;
                 }
                 else{
-                    currentRotation = currentRotation + Math.PI / (2 * rotationSteps);
-                };
+                    currentRotation += rotationSpeed;
+                }
                 break;
             default: 
                 break;
@@ -114,17 +134,20 @@ function Cubie(props){
     //turn functions
     //color order: right, left, top, bottom, front, back
     return(
-        <mesh
-            position = {props.position}
-            ref = {mesh}>
-            <boxBufferGeometry attach = "geometry" args = {[cubieSize, cubieSize, cubieSize]}/>
-            <meshStandardMaterial color = {colors[props.coloring[0]]} attach = {"material-0"}/>
-            <meshStandardMaterial color = {colors[props.coloring[1]]} attach = {"material-1"}/>
-            <meshStandardMaterial color = {colors[props.coloring[2]]} attach = {"material-2"}/>
-            <meshStandardMaterial color = {colors[props.coloring[3]]} attach = {"material-3"}/>
-            <meshStandardMaterial color = {colors[props.coloring[4]]} attach = {"material-4"}/>
-            <meshStandardMaterial color = {colors[props.coloring[5]]} attach = {"material-5"}/> 
-        </mesh>
+        <group
+            position = {[0, 0, 0]}
+            ref = {group}>
+            <mesh
+                position = {props.position}>
+                <boxBufferGeometry attach = "geometry" args = {[cubieSize, cubieSize, cubieSize]}/>
+                <meshStandardMaterial color = {colors[props.coloring[0]]} attach = {"material-0"}/>
+                <meshStandardMaterial color = {colors[props.coloring[1]]} attach = {"material-1"}/>
+                <meshStandardMaterial color = {colors[props.coloring[2]]} attach = {"material-2"}/>
+                <meshStandardMaterial color = {colors[props.coloring[3]]} attach = {"material-3"}/>
+                <meshStandardMaterial color = {colors[props.coloring[4]]} attach = {"material-4"}/>
+                <meshStandardMaterial color = {colors[props.coloring[5]]} attach = {"material-5"}/> 
+            </mesh>
+        </group>
     );
     
 }
