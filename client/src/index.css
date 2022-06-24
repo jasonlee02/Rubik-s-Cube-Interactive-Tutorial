@@ -14,10 +14,12 @@ code {
 /*put in the vertical middle of the root div*/
 .cubeelement{
   position: absolute;
-  width: 50vw;
-  height: 50vw;
+  width: 40vw;
+  height: 50vh;
   top: 50%;
+  left: 5%;
   transform: translate(0, -50%);
+  background-color: black;
 }
 
 #root{

@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import {Canvas, useFrame, useThree} from '@react-three/fiber/';
+import { useGesture } from '@use-gesture/react';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
 
@@ -130,15 +131,41 @@ function Cubie(props){
         }
     })
     let currentRotation = 0;
-    //relate current turn ints to turn functions
-    //turn functions
+    const bind = useGesture(
+        {
+            onDrag: ({event, offset: [x, y]}) => {
+                event.stopPropagation();
+                showDirection(x, y);
+            },
+            onDragEnd: ({event, offset: [x, y]}) => {
+                event.stopPropagation();
+                doTurn(x, y);
+            }
+        }
+    )
+    function showDirection(x, y){
+        if (x < 25 && y < 25){
+        }
+        else if (x < 0 && x < y){
+
+        }
+    } 
+    function doTurn(x, y){
+        if (x < 25 && y < 25){
+            return -1;
+        }
+        else if (x > y){
+
+        }
+    }
     //color order: right, left, top, bottom, front, back
     return(
         <group
             position = {[0, 0, 0]}
             ref = {group}>
             <mesh
-                position = {props.position}>
+                position = {props.position}
+                {...bind()}>
                 <boxBufferGeometry attach = "geometry" args = {[cubieSize, cubieSize, cubieSize]}/>
                 <meshStandardMaterial color = {colors[props.coloring[0]]} attach = {"material-0"}/>
                 <meshStandardMaterial color = {colors[props.coloring[1]]} attach = {"material-1"}/>
