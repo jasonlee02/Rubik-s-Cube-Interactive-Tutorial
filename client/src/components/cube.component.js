@@ -1,8 +1,10 @@
-import React, {useEffect} from 'react';
-import {Canvas, useFrame, useThree} from '@react-three/fiber/';
+import React, {useEffect, useState} from 'react';
+import {Canvas, useFrame, useThree, useLoader} from '@react-three/fiber/';
 import { useGesture } from '@use-gesture/react';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
+import arrowimg from '../assets/testarrow.jpg';
+import blankimg from '../assets/blank.png';
 
 const cubieSize = 1;
 const distancingConstant = 1.05;
@@ -43,6 +45,7 @@ function Cubie(props){
     let originalRotationX = 0;
     let originalRotationY = 0;
     let originalRotationZ = 0;
+    let currentRotation = 0;
     useFrame(() => {
         //get index to find the current turn
         switch(currentTurn[index][1]){
@@ -130,24 +133,50 @@ function Cubie(props){
                 break;
         }
     })
-    let currentRotation = 0;
     const bind = useGesture(
         {
-            onDrag: ({event, offset: [x, y]}) => {
+            onDrag: ({event, movement: [x, y]}) => {
                 event.stopPropagation();
                 showDirection(x, y);
             },
-            onDragEnd: ({event, offset: [x, y]}) => {
+            onDragEnd: ({event, movement: [x, y]}) => {
                 event.stopPropagation();
                 doTurn(x, y);
             }
         }
     )
+    const arrowTexture = useLoader(THREE.TextureLoader, arrowimg);
+    const blankTexture = useLoader(THREE.TextureLoader, blankimg);
+    const [map0, setmap0] = useState(blankTexture);
+    const [map1, setmap1] = useState(blankTexture);
+    const [map2, setmap2] = useState(blankTexture);
+    const [map3, setmap3] = useState(blankTexture);
+    const [map4, setmap4] = useState(blankTexture);
+    const [map5, setmap5] = useState(blankTexture);
     function showDirection(x, y){
-        if (x < 25 && y < 25){
+        if ((x < 25 && x > -25) && (y < 25 && y > -25)){
+            setmap0(blankTexture);
+            setmap1(blankTexture);
+            setmap2(blankTexture);
+            setmap3(blankTexture);
+            setmap4(blankTexture);
+            setmap5(blankTexture);
         }
-        else if (x < 0 && x < y){
-
+        else if (x < 0 && Math.abs(x) >= Math.abs(y)){
+            setmap0(arrowTexture);
+            setmap1(arrowTexture);
+            setmap2(arrowTexture);
+            setmap3(arrowTexture);
+            setmap4(arrowTexture);
+            setmap5(arrowTexture);
+        }
+        else{
+            setmap0(blankTexture);
+            setmap1(blankTexture);
+            setmap2(blankTexture);
+            setmap3(blankTexture);
+            setmap4(blankTexture);
+            setmap5(blankTexture);
         }
     } 
     function doTurn(x, y){
@@ -157,6 +186,12 @@ function Cubie(props){
         else if (x > y){
 
         }
+        setmap0(blankTexture);
+        setmap1(blankTexture);
+        setmap2(blankTexture);
+        setmap3(blankTexture);
+        setmap4(blankTexture);
+        setmap5(blankTexture);
     }
     //color order: right, left, top, bottom, front, back
     return(
@@ -167,12 +202,12 @@ function Cubie(props){
                 position = {props.position}
                 {...bind()}>
                 <boxBufferGeometry attach = "geometry" args = {[cubieSize, cubieSize, cubieSize]}/>
-                <meshStandardMaterial color = {colors[props.coloring[0]]} attach = {"material-0"}/>
-                <meshStandardMaterial color = {colors[props.coloring[1]]} attach = {"material-1"}/>
-                <meshStandardMaterial color = {colors[props.coloring[2]]} attach = {"material-2"}/>
-                <meshStandardMaterial color = {colors[props.coloring[3]]} attach = {"material-3"}/>
-                <meshStandardMaterial color = {colors[props.coloring[4]]} attach = {"material-4"}/>
-                <meshStandardMaterial color = {colors[props.coloring[5]]} attach = {"material-5"}/> 
+                <meshStandardMaterial color = {colors[props.coloring[0]]} attach = {"material-0"} map = {map0}/>
+                <meshStandardMaterial color = {colors[props.coloring[1]]} attach = {"material-1"} map = {map1}/>
+                <meshStandardMaterial color = {colors[props.coloring[2]]} attach = {"material-2"} map = {map2}/>
+                <meshStandardMaterial color = {colors[props.coloring[3]]} attach = {"material-3"} map = {map3}/>
+                <meshStandardMaterial color = {colors[props.coloring[4]]} attach = {"material-4"} map = {map4}/>
+                <meshStandardMaterial color = {colors[props.coloring[5]]} attach = {"material-5"} map = {map5}/> 
             </mesh>
         </group>
     );
