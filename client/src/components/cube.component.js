@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {Canvas, useFrame, useThree, useLoader} from '@react-three/fiber/';
+import React, { useEffect, useState } from 'react';
+import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber/';
 import { useGesture } from '@use-gesture/react';
-import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
-import arrowimg from '../assets/testarrow.jpg';
+import arrowimg from '../assets/arrowimg.png';
 import blankimg from '../assets/blank.png';
 
 const cubieSize = 1;
@@ -133,8 +133,20 @@ function Cubie(props){
                 break;
         }
     })
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const camera = useThree((state) => state.camera);
+    let face = -1;
+    const cubie = React.useRef();
     const bind = useGesture(
         {
+            onDragStart: ({initial: [x, y]}) => {
+                pointer.x = ( (x - (window.innerWidth * .05)) / (window.innerWidth * .4) ) * 2 - 1;
+                pointer.y = - ( (y - (window.innerHeight * .25)) / (window.innerHeight * .5) ) * 2 + 1;
+                raycaster.setFromCamera(pointer, camera);
+                let intersect = raycaster.intersectObject(cubie.current, true);
+                face = Math.floor(intersect[0].faceIndex / 2);
+            },
             onDrag: ({event, movement: [x, y]}) => {
                 event.stopPropagation();
                 showDirection(x, y);
@@ -142,6 +154,12 @@ function Cubie(props){
             onDragEnd: ({event, movement: [x, y]}) => {
                 event.stopPropagation();
                 doTurn(x, y);
+                setmap0(blankTexture);
+                setmap1(blankTexture);
+                setmap2(blankTexture);
+                setmap3(blankTexture);
+                setmap4(blankTexture);
+                setmap5(blankTexture);
             }
         }
     )
@@ -163,12 +181,24 @@ function Cubie(props){
             setmap5(blankTexture);
         }
         else if (x < 0 && Math.abs(x) >= Math.abs(y)){
-            setmap0(arrowTexture);
-            setmap1(arrowTexture);
-            setmap2(arrowTexture);
-            setmap3(arrowTexture);
-            setmap4(arrowTexture);
-            setmap5(arrowTexture);
+            if (face === 0){
+                setmap0(arrowTexture);
+            }
+            else if (face === 1){
+                setmap1(arrowTexture);
+            }
+            else if (face === 2){
+                setmap2(arrowTexture);
+            }
+            else if (face === 3){
+                setmap3(arrowTexture);
+            }
+            else if (face === 4){
+                setmap4(arrowTexture);
+            }
+            else if (face === 5){
+                setmap5(arrowTexture);
+            }
         }
         else{
             setmap0(blankTexture);
@@ -186,12 +216,6 @@ function Cubie(props){
         else if (x > y){
 
         }
-        setmap0(blankTexture);
-        setmap1(blankTexture);
-        setmap2(blankTexture);
-        setmap3(blankTexture);
-        setmap4(blankTexture);
-        setmap5(blankTexture);
     }
     //color order: right, left, top, bottom, front, back
     return(
@@ -200,7 +224,8 @@ function Cubie(props){
             ref = {group}>
             <mesh
                 position = {props.position}
-                {...bind()}>
+                {...bind()}
+                ref = {cubie}>
                 <boxBufferGeometry attach = "geometry" args = {[cubieSize, cubieSize, cubieSize]}/>
                 <meshStandardMaterial color = {colors[props.coloring[0]]} attach = {"material-0"} map = {map0}/>
                 <meshStandardMaterial color = {colors[props.coloring[1]]} attach = {"material-1"} map = {map1}/>

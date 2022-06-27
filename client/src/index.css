@@ -16,9 +16,8 @@ code {
   position: absolute;
   width: 40vw;
   height: 50vh;
-  top: 50%;
+  top: 25%;
   left: 5%;
-  transform: translate(0, -50%);
   background-color: black;
 }
 
