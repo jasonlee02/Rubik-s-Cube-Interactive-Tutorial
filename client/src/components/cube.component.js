@@ -16,10 +16,15 @@ const rotationSpeed = (Math.PI / 2) / rotationSteps;
 const distanceCubies = (element) => {
     return element * distancingConstant * cubieSize;
 }
-const coordstondc = (x, y) => {
-    x = ( (x - (window.innerWidth * .05)) / (window.innerWidth * .4) ) * 2 - 1;
-    y = - ( (y - (window.innerHeight * .25)) / (window.innerHeight * .5) ) * 2 + 1;
-    return ([x, y]);
+const coordstondc = (vector) => {
+    const x = ( (vector.x) / (window.innerWidth * .4) ) * 2 - 1;
+    const y = - ( (vector.y) / (window.innerHeight * .5) ) * 2 + 1;
+    return (vector.set(x, y));
+}
+const ndctocoords = (vector) => {
+    const x = (window.innerWidth * 0.4 * ((1 + vector.x) / 2));
+    const y = (window.innerHeight * 0.5 * ((-1 + vector.y) / -2));
+    return (vector.set(x, y));
 }
 
 export default function Cube(props){
@@ -142,38 +147,42 @@ function Cubie(props){
         }
     })
     const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
+    let pointer = new THREE.Vector2();
     const mouseVector = new THREE.Vector2();
     const camera = useThree((state) => state.camera);
     let face = -1;
     const cubie = React.useRef();
-    const vectorUp = new THREE.Vector3();
+    let vectorUp = new THREE.Vector3();
     const vectorUp2d = new THREE.Vector2();
-    const vectorRight = new THREE.Vector3();
+    let vectorRight = new THREE.Vector3();
     const vectorRight2d = new THREE.Vector2();
-    const vectorDown = new THREE.Vector3();
+    let vectorDown = new THREE.Vector3();
     const vectorDown2d = new THREE.Vector2();
-    const vectorLeft = new THREE.Vector3();
+    let vectorLeft = new THREE.Vector3();
     const vectorLeft2d = new THREE.Vector2();
     const bind = useGesture(
         {
             onDragStart: ({initial: [x, y]}) => {
                 //ndc = normalized device coordinates
-                const ndc = coordstondc(x, y)
-                pointer.set(ndc[0], ndc[1]);
+                pointer.x = (( x - window.innerWidth * 0.05) / (window.innerWidth * .4) ) * 2 - 1;
+                pointer.y = - ( (y - window.innerHeight * 0.25) / (window.innerHeight * .5) ) * 2 + 1;
                 raycaster.setFromCamera(pointer, camera);
                 let intersect = raycaster.intersectObject(cubie.current, true);
                 face = Math.floor(intersect[0].faceIndex / 2);
                 const normalVector = intersect[0].face.normal;
                 setPlaneVectors(normalVector);
+
                 vectorUp.project(camera);
-                vectorUp2d.set(vectorUp.x, vectorUp.y)
+                vectorUp2d.set(vectorUp.x, -vectorUp.y)
+
                 vectorRight.project(camera);
-                vectorRight2d.set(vectorRight.x, vectorRight.y)
+                vectorRight2d.set(vectorRight.x, -vectorRight.y)
+
                 vectorDown.project(camera);
-                vectorDown2d.set(vectorDown.x, vectorDown.y)
+                vectorDown2d.set(vectorDown.x, -vectorDown.y)
+
                 vectorLeft.project(camera);
-                vectorLeft2d.set(vectorLeft.x, vectorLeft.y)
+                vectorLeft2d.set(vectorLeft.x, -vectorLeft.y)
             },
             onDrag: ({event, movement: [x, y]}) => {
                 event.stopPropagation();
