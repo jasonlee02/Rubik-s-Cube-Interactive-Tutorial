@@ -3,7 +3,10 @@ import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber/';
 import { useGesture } from '@use-gesture/react';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
-import arrowimg from '../assets/arrowimg.png';
+import arrowup from '../assets/arrowup.png';
+import arrowdown from '../assets/arrowdown.png';
+import arrowleft from '../assets/arrowleft.png';
+import arrowright from '../assets/arrowright.png';
 import blankimg from '../assets/blank.png';
 
 const cubieSize = 1;
@@ -12,6 +15,11 @@ const rotationSteps = 100;
 const rotationSpeed = (Math.PI / 2) / rotationSteps;
 const distanceCubies = (element) => {
     return element * distancingConstant * cubieSize;
+}
+const coordstondc = (x, y) => {
+    x = ( (x - (window.innerWidth * .05)) / (window.innerWidth * .4) ) * 2 - 1;
+    y = - ( (y - (window.innerHeight * .25)) / (window.innerHeight * .5) ) * 2 + 1;
+    return ([x, y]);
 }
 
 export default function Cube(props){
@@ -135,17 +143,37 @@ function Cubie(props){
     })
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
+    const mouseVector = new THREE.Vector2();
     const camera = useThree((state) => state.camera);
     let face = -1;
     const cubie = React.useRef();
+    const vectorUp = new THREE.Vector3();
+    const vectorUp2d = new THREE.Vector2();
+    const vectorRight = new THREE.Vector3();
+    const vectorRight2d = new THREE.Vector2();
+    const vectorDown = new THREE.Vector3();
+    const vectorDown2d = new THREE.Vector2();
+    const vectorLeft = new THREE.Vector3();
+    const vectorLeft2d = new THREE.Vector2();
     const bind = useGesture(
         {
             onDragStart: ({initial: [x, y]}) => {
-                pointer.x = ( (x - (window.innerWidth * .05)) / (window.innerWidth * .4) ) * 2 - 1;
-                pointer.y = - ( (y - (window.innerHeight * .25)) / (window.innerHeight * .5) ) * 2 + 1;
+                //ndc = normalized device coordinates
+                const ndc = coordstondc(x, y)
+                pointer.set(ndc[0], ndc[1]);
                 raycaster.setFromCamera(pointer, camera);
                 let intersect = raycaster.intersectObject(cubie.current, true);
                 face = Math.floor(intersect[0].faceIndex / 2);
+                const normalVector = intersect[0].face.normal;
+                setPlaneVectors(normalVector);
+                vectorUp.project(camera);
+                vectorUp2d.set(vectorUp.x, vectorUp.y)
+                vectorRight.project(camera);
+                vectorRight2d.set(vectorRight.x, vectorRight.y)
+                vectorDown.project(camera);
+                vectorDown2d.set(vectorDown.x, vectorDown.y)
+                vectorLeft.project(camera);
+                vectorLeft2d.set(vectorLeft.x, vectorLeft.y)
             },
             onDrag: ({event, movement: [x, y]}) => {
                 event.stopPropagation();
@@ -163,7 +191,42 @@ function Cubie(props){
             }
         }
     )
-    const arrowTexture = useLoader(THREE.TextureLoader, arrowimg);
+    function setPlaneVectors(normalVector){
+        if (normalVector.y === 1 || normalVector.y === -1){
+            vectorUp.set(0, 0, -1);
+            vectorDown.set(0, 0, 1);
+            vectorRight.set(1, 0, 0);
+            vectorLeft.set(-1, 0, 0);
+        }
+        else if (normalVector.x === 1){
+            vectorUp.set(0, 1, 0);
+            vectorDown.set(0, -1, 0);
+            vectorRight.set(0, 0, -1);
+            vectorLeft.set(0, 0, 1);
+        }
+        else if (normalVector.x === -1){
+            vectorUp.set(0, 1, 0);
+            vectorDown.set(0, -1, 0);
+            vectorRight.set(0, 0, 1);
+            vectorLeft.set(0, 0, -1);
+        }
+        else if (normalVector.z === 1) {
+            vectorUp.set(0, 1, 0);
+            vectorDown.set(0, -1, 0);
+            vectorRight.set(1, 0, 0);
+            vectorLeft.set(-1, 0, 0);
+        }
+        else if (normalVector.z === -1){
+            vectorUp.set(0, 1, 0);
+            vectorDown.set(0, -1, 0);
+            vectorRight.set(-1, 0, 0);
+            vectorLeft.set(1, 0, 0);
+        }
+    }
+    const arrowUpTexture = useLoader(THREE.TextureLoader, arrowup);
+    const arrowDownTexture = useLoader(THREE.TextureLoader, arrowdown);
+    const arrowRightTexture = useLoader(THREE.TextureLoader, arrowright);
+    const arrowLeftTexture = useLoader(THREE.TextureLoader, arrowleft);
     const blankTexture = useLoader(THREE.TextureLoader, blankimg);
     const [map0, setmap0] = useState(blankTexture);
     const [map1, setmap1] = useState(blankTexture);
@@ -180,33 +243,56 @@ function Cubie(props){
             setmap4(blankTexture);
             setmap5(blankTexture);
         }
-        else if (x < 0 && Math.abs(x) >= Math.abs(y)){
+        //todo: convert NDC to normal coords 
+        else{
+            mouseVector.set(x, y);
+            let angToUp = Math.abs(mouseVector.angle() - vectorUp2d.angle());
+            let angToRight = Math.abs(mouseVector.angle() - vectorRight2d.angle());
+            let angToDown = Math.abs(mouseVector.angle() - vectorDown2d.angle());
+            let angToLeft = Math.abs(mouseVector.angle() - vectorLeft2d.angle());
+            while (angToUp > (Math.PI * 2)){
+                angToUp -= (Math.PI * 2);
+            }
+            while (angToRight > (Math.PI * 2)){
+                angToRight -= (Math.PI * 2);
+            }
+            while (angToDown > (Math.PI * 2)){
+                angToDown -= (Math.PI * 2);
+            }
+            while (angToLeft > (Math.PI * 2)){
+                angToLeft -= (Math.PI * 2);
+            }
+            let texture = blankTexture;
+            if (angToUp < angToRight && angToUp < angToLeft && angToUp < angToDown){
+                texture = arrowUpTexture;
+            }
+            else if (angToRight < angToLeft && angToRight < angToDown){
+                texture = arrowRightTexture;
+            }
+            else if (angToLeft < angToDown){
+                texture = arrowLeftTexture;
+            }
+            else{
+                texture = arrowDownTexture;
+            }
             if (face === 0){
-                setmap0(arrowTexture);
+                setmap0(texture);
             }
             else if (face === 1){
-                setmap1(arrowTexture);
+                setmap1(texture);
             }
             else if (face === 2){
-                setmap2(arrowTexture);
+                setmap2(texture);
             }
             else if (face === 3){
-                setmap3(arrowTexture);
+                setmap3(texture);
             }
             else if (face === 4){
-                setmap4(arrowTexture);
+                setmap4(texture);
             }
             else if (face === 5){
-                setmap5(arrowTexture);
+                setmap5(texture);
             }
-        }
-        else{
-            setmap0(blankTexture);
-            setmap1(blankTexture);
-            setmap2(blankTexture);
-            setmap3(blankTexture);
-            setmap4(blankTexture);
-            setmap5(blankTexture);
         }
     } 
     function doTurn(x, y){
