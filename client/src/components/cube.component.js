@@ -13,14 +13,17 @@ const cubieSize = 1;
 const distancingConstant = 1.05;
 const rotationSteps = 100;
 const rotationSpeed = (Math.PI / 2) / rotationSteps;
+
 const distanceCubies = (element) => {
     return element * distancingConstant * cubieSize;
 }
+
 const coordstondc = (vector) => {
     const x = ( (vector.x) / (window.innerWidth * .4) ) * 2 - 1;
     const y = - ( (vector.y) / (window.innerHeight * .5) ) * 2 + 1;
     return (vector.set(x, y));
 }
+
 const ndctocoords = (vector) => {
     const x = (window.innerWidth * 0.4 * ((1 + vector.x) / 2));
     const y = (window.innerHeight * 0.5 * ((-1 + vector.y) / -2));
@@ -52,6 +55,22 @@ function getCubieList(props){
     }
     return CubieArray;
 }
+
+const raycaster = new THREE.Raycaster();
+let pointer = new THREE.Vector2();
+const mouseVector = new THREE.Vector2();
+
+let face = -1;
+
+let vectorUp = new THREE.Vector3();
+const vectorUp2d = new THREE.Vector2();
+let vectorRight = new THREE.Vector3();
+const vectorRight2d = new THREE.Vector2();
+let vectorDown = new THREE.Vector3();
+const vectorDown2d = new THREE.Vector2();
+let vectorLeft = new THREE.Vector3();
+const vectorLeft2d = new THREE.Vector2();
+
 function Cubie(props){
     const index = props.cubieNum;
     const group = React.useRef();
@@ -59,6 +78,7 @@ function Cubie(props){
     let originalRotationY = 0;
     let originalRotationZ = 0;
     let currentRotation = 0;
+
     useFrame(() => {
         //get index to find the current turn
         switch(currentTurn[index][1]){
@@ -146,20 +166,10 @@ function Cubie(props){
                 break;
         }
     })
-    const raycaster = new THREE.Raycaster();
-    let pointer = new THREE.Vector2();
-    const mouseVector = new THREE.Vector2();
+
     const camera = useThree((state) => state.camera);
-    let face = -1;
     const cubie = React.useRef();
-    let vectorUp = new THREE.Vector3();
-    const vectorUp2d = new THREE.Vector2();
-    let vectorRight = new THREE.Vector3();
-    const vectorRight2d = new THREE.Vector2();
-    let vectorDown = new THREE.Vector3();
-    const vectorDown2d = new THREE.Vector2();
-    let vectorLeft = new THREE.Vector3();
-    const vectorLeft2d = new THREE.Vector2();
+
     const bind = useGesture(
         {
             onDragStart: ({initial: [x, y]}) => {
@@ -167,27 +177,30 @@ function Cubie(props){
                 pointer.x = (( x - window.innerWidth * 0.05) / (window.innerWidth * .4) ) * 2 - 1;
                 pointer.y = - ( (y - window.innerHeight * 0.25) / (window.innerHeight * .5) ) * 2 + 1;
                 raycaster.setFromCamera(pointer, camera);
-                let intersect = raycaster.intersectObject(cubie.current, true);
+                var intersect = raycaster.intersectObject(cubie.current, true);
                 face = Math.floor(intersect[0].faceIndex / 2);
-                const normalVector = intersect[0].face.normal;
-                setPlaneVectors(normalVector);
+
+                setPlaneVectors(intersect[0].face.normal);
 
                 vectorUp.project(camera);
-                vectorUp2d.set(vectorUp.x, -vectorUp.y)
+                vectorUp2d.set(vectorUp.x * window.innerWidth * 0.4, -vectorUp.y * window.innerHeight * 0.5);
 
                 vectorRight.project(camera);
-                vectorRight2d.set(vectorRight.x, -vectorRight.y)
+                vectorRight2d.set(vectorRight.x * window.innerWidth * 0.4, -vectorRight.y * window.innerHeight * 0.5);
 
                 vectorDown.project(camera);
-                vectorDown2d.set(vectorDown.x, -vectorDown.y)
+                vectorDown2d.set(vectorDown.x * window.innerWidth * 0.4, -vectorDown.y * window.innerHeight * 0.5);
 
                 vectorLeft.project(camera);
-                vectorLeft2d.set(vectorLeft.x, -vectorLeft.y)
+                vectorLeft2d.set(vectorLeft.x * window.innerWidth * 0.4, -vectorLeft.y * window.innerHeight * 0.5);
+
             },
+
             onDrag: ({event, movement: [x, y]}) => {
                 event.stopPropagation();
                 showDirection(x, y);
             },
+
             onDragEnd: ({event, movement: [x, y]}) => {
                 event.stopPropagation();
                 doTurn(x, y);
@@ -200,10 +213,17 @@ function Cubie(props){
             }
         }
     )
+
     function setPlaneVectors(normalVector){
-        if (normalVector.y === 1 || normalVector.y === -1){
+        if (normalVector.y === 1){
             vectorUp.set(0, 0, -1);
             vectorDown.set(0, 0, 1);
+            vectorRight.set(1, 0, 0);
+            vectorLeft.set(-1, 0, 0);
+        }
+        else if (normalVector.y === -1){
+            vectorUp.set(0, 0, 1);
+            vectorDown.set(0, 0, -1);
             vectorRight.set(1, 0, 0);
             vectorLeft.set(-1, 0, 0);
         }
@@ -232,17 +252,20 @@ function Cubie(props){
             vectorLeft.set(1, 0, 0);
         }
     }
+
     const arrowUpTexture = useLoader(THREE.TextureLoader, arrowup);
     const arrowDownTexture = useLoader(THREE.TextureLoader, arrowdown);
     const arrowRightTexture = useLoader(THREE.TextureLoader, arrowright);
     const arrowLeftTexture = useLoader(THREE.TextureLoader, arrowleft);
     const blankTexture = useLoader(THREE.TextureLoader, blankimg);
+
     const [map0, setmap0] = useState(blankTexture);
     const [map1, setmap1] = useState(blankTexture);
     const [map2, setmap2] = useState(blankTexture);
     const [map3, setmap3] = useState(blankTexture);
     const [map4, setmap4] = useState(blankTexture);
     const [map5, setmap5] = useState(blankTexture);
+
     function showDirection(x, y){
         if ((x < 25 && x > -25) && (y < 25 && y > -25)){
             setmap0(blankTexture);
@@ -251,14 +274,14 @@ function Cubie(props){
             setmap3(blankTexture);
             setmap4(blankTexture);
             setmap5(blankTexture);
-        }
-        //todo: convert NDC to normal coords 
+        } 
         else{
             mouseVector.set(x, y);
-            let angToUp = Math.abs(mouseVector.angle() - vectorUp2d.angle());
-            let angToRight = Math.abs(mouseVector.angle() - vectorRight2d.angle());
-            let angToDown = Math.abs(mouseVector.angle() - vectorDown2d.angle());
-            let angToLeft = Math.abs(mouseVector.angle() - vectorLeft2d.angle());
+            var angToUp = Math.abs(mouseVector.angle() - vectorUp2d.angle());
+            var angToRight = Math.abs(mouseVector.angle() - vectorRight2d.angle());
+            var angToDown = Math.abs(mouseVector.angle() - vectorDown2d.angle());
+            var angToLeft = Math.abs(mouseVector.angle() - vectorLeft2d.angle());
+            
             while (angToUp > (Math.PI * 2)){
                 angToUp -= (Math.PI * 2);
             }
@@ -271,7 +294,8 @@ function Cubie(props){
             while (angToLeft > (Math.PI * 2)){
                 angToLeft -= (Math.PI * 2);
             }
-            let texture = blankTexture;
+
+            var texture;
             if (angToUp < angToRight && angToUp < angToLeft && angToUp < angToDown){
                 texture = arrowUpTexture;
             }
@@ -284,6 +308,7 @@ function Cubie(props){
             else{
                 texture = arrowDownTexture;
             }
+
             if (face === 0){
                 setmap0(texture);
             }
