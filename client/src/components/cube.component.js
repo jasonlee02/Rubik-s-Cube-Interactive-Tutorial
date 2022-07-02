@@ -18,18 +18,6 @@ const distanceCubies = (element) => {
     return element * distancingConstant * cubieSize;
 }
 
-const coordstondc = (vector) => {
-    const x = ( (vector.x) / (window.innerWidth * .4) ) * 2 - 1;
-    const y = - ( (vector.y) / (window.innerHeight * .5) ) * 2 + 1;
-    return (vector.set(x, y));
-}
-
-const ndctocoords = (vector) => {
-    const x = (window.innerWidth * 0.4 * ((1 + vector.x) / 2));
-    const y = (window.innerHeight * 0.5 * ((-1 + vector.y) / -2));
-    return (vector.set(x, y));
-}
-
 export default function Cube(props){
     return(
         <Canvas>
@@ -60,15 +48,16 @@ const raycaster = new THREE.Raycaster();
 let pointer = new THREE.Vector2();
 const mouseVector = new THREE.Vector2();
 
+let normalVector = new THREE.Vector3();
 let face = -1;
 
-let vectorUp = new THREE.Vector3();
+const vectorUp = new THREE.Vector3();
 const vectorUp2d = new THREE.Vector2();
-let vectorRight = new THREE.Vector3();
+const vectorRight = new THREE.Vector3();
 const vectorRight2d = new THREE.Vector2();
-let vectorDown = new THREE.Vector3();
+const vectorDown = new THREE.Vector3();
 const vectorDown2d = new THREE.Vector2();
-let vectorLeft = new THREE.Vector3();
+const vectorLeft = new THREE.Vector3();
 const vectorLeft2d = new THREE.Vector2();
 
 function Cubie(props){
@@ -178,9 +167,9 @@ function Cubie(props){
                 pointer.y = - ( (y - window.innerHeight * 0.25) / (window.innerHeight * .5) ) * 2 + 1;
                 raycaster.setFromCamera(pointer, camera);
                 var intersect = raycaster.intersectObject(cubie.current, true);
+                normalVector = intersect[0].face.normal;
                 face = Math.floor(intersect[0].faceIndex / 2);
-
-                setPlaneVectors(intersect[0].face.normal);
+                setPlaneVectors(normalVector);
 
                 vectorUp.project(camera);
                 vectorUp2d.set(vectorUp.x * window.innerWidth * 0.4, -vectorUp.y * window.innerHeight * 0.5);
@@ -266,6 +255,8 @@ function Cubie(props){
     const [map4, setmap4] = useState(blankTexture);
     const [map5, setmap5] = useState(blankTexture);
 
+    let texture;
+
     function showDirection(x, y){
         if ((x < 25 && x > -25) && (y < 25 && y > -25)){
             setmap0(blankTexture);
@@ -277,10 +268,10 @@ function Cubie(props){
         } 
         else{
             mouseVector.set(x, y);
-            var angToUp = Math.abs(mouseVector.angle() - vectorUp2d.angle());
-            var angToRight = Math.abs(mouseVector.angle() - vectorRight2d.angle());
-            var angToDown = Math.abs(mouseVector.angle() - vectorDown2d.angle());
-            var angToLeft = Math.abs(mouseVector.angle() - vectorLeft2d.angle());
+            let angToUp = Math.abs(mouseVector.angle() - vectorUp2d.angle());
+            let angToRight = Math.abs(mouseVector.angle() - vectorRight2d.angle());
+            let angToDown = Math.abs(mouseVector.angle() - vectorDown2d.angle());
+            let angToLeft = Math.abs(mouseVector.angle() - vectorLeft2d.angle());
             
             while (angToUp > (Math.PI * 2)){
                 angToUp -= (Math.PI * 2);
@@ -295,7 +286,6 @@ function Cubie(props){
                 angToLeft -= (Math.PI * 2);
             }
 
-            var texture;
             if (angToUp < angToRight && angToUp < angToLeft && angToUp < angToDown){
                 texture = arrowUpTexture;
             }
@@ -329,14 +319,293 @@ function Cubie(props){
             }
         }
     } 
-    function doTurn(x, y){
-        if (x < 25 && y < 25){
-            return -1;
-        }
-        else if (x > y){
 
+    function doTurn(x, y){
+        const cubiePosition = cubie.current.position;
+        //right side
+        if (normalVector.equals(new THREE.Vector3(1, 0, 0))){
+            if (texture === arrowUpTexture){
+                if (cubiePosition.z < 0){
+                    moveB();
+                }
+                else if (cubiePosition.z === 0){
+                    moveS();
+                }
+                else if (cubiePosition.z > 0){
+                    moveFi()
+                }
+            }
+            else if (texture === arrowRightTexture){
+                if (cubiePosition.y < 0){
+                    moveD();
+                }
+                else if (cubiePosition.y === 0){
+                    moveE();
+                }
+                else if (cubiePosition.y > 0){
+                    moveUi();
+                }
+            }
+            else if (texture === arrowDownTexture){
+                if (cubiePosition.z < 0){
+                    moveBi();
+                }
+                else if (cubiePosition.z === 0){
+                    moveSi();
+                }
+                else if (cubiePosition.z > 0){
+                    moveF()
+                }
+            }
+            else if (texture === arrowLeftTexture){
+                if (cubiePosition.y < 0){
+                    moveDi();
+                }
+                else if (cubiePosition.y === 0){
+                    moveEi();
+                }
+                else if (cubiePosition.y > 0){
+                    moveU();
+                }
+            }
+        }
+        //left side
+        else if (normalVector.equals(new THREE.Vector3(-1, 0, 0))){
+            if (texture === arrowUpTexture){
+                if (cubiePosition.z < 0){
+                    moveBi();
+                }
+                else if (cubiePosition.z === 0){
+                    moveSi();
+                }
+                else if (cubiePosition.z > 0){
+                    moveF()
+                }
+            }
+            else if (texture === arrowRightTexture){
+                if (cubiePosition.y < 0){
+                    moveD();
+                }
+                else if (cubiePosition.y === 0){
+                    moveE();
+                }
+                else if (cubiePosition.y > 0){
+                    moveUi();
+                }
+            }
+            else if (texture === arrowDownTexture){
+                if (cubiePosition.z < 0){
+                    moveB();
+                }
+                else if (cubiePosition.z === 0){
+                    moveS();
+                }
+                else if (cubiePosition.z > 0){
+                    moveFi()
+                }
+            }
+            else if (texture === arrowLeftTexture){
+                if (cubiePosition.y < 0){
+                    moveDi();
+                }
+                else if (cubiePosition.y === 0){
+                    moveEi();
+                }
+                else if (cubiePosition.y > 0){
+                    moveU();
+                }
+            }
+        }
+        //top side
+        else if (normalVector.equals(new THREE.Vector3(0, 1, 0))){
+            if (texture === arrowUpTexture){
+                if (cubiePosition.x < 0){
+                    moveLi();
+                }
+                else if (cubiePosition.x === 0){
+                    moveMi();
+                }
+                else if (cubiePosition.x > 0){
+                    moveR();
+                }
+            }
+            else if (texture === arrowRightTexture){
+                if (cubiePosition.z < 0){
+                    moveBi();
+                }
+                else if (cubiePosition.z === 0){
+                    moveSi();
+                }
+                else if (cubiePosition.z > 0){
+                    moveF()
+                }
+            }
+            else if (texture === arrowDownTexture){
+                if (cubiePosition.x < 0){
+                    moveL();
+                }
+                else if (cubiePosition.x === 0){
+                    moveM();
+                }
+                else if (cubiePosition.x > 0){
+                    moveRi();
+                }
+            }
+            else if (texture === arrowLeftTexture){
+                if (cubiePosition.z < 0){
+                    moveB();
+                }
+                else if (cubiePosition.z === 0){
+                    moveS();
+                }
+                else if (cubiePosition.z > 0){
+                    moveFi()
+                }
+            }
+        }
+        //down side
+        else if (normalVector.equals(new THREE.Vector3(0, -1, 0))){
+            if (texture === arrowUpTexture){
+                if (cubiePosition.x < 0){
+                    moveLi();
+                }
+                else if (cubiePosition.x === 0){
+                    moveMi();
+                }
+                else if (cubiePosition.x > 0){
+                    moveR();
+                }
+            }
+            else if (texture === arrowRightTexture){
+                if (cubiePosition.z < 0){
+                    moveB();
+                }
+                else if (cubiePosition.z === 0){
+                    moveS();
+                }
+                else if (cubiePosition.z > 0){
+                    moveFi()
+                }
+            }
+            else if (texture === arrowDownTexture){
+                if (cubiePosition.x < 0){
+                    moveL();
+                }
+                else if (cubiePosition.x === 0){
+                    moveM();
+                }
+                else if (cubiePosition.x > 0){
+                    moveRi();
+                }
+            }
+            else if (texture === arrowLeftTexture){
+                if (cubiePosition.z < 0){
+                    moveBi();
+                }
+                else if (cubiePosition.z === 0){
+                    moveSi();
+                }
+                else if (cubiePosition.z > 0){
+                    moveF()
+                }
+            }
+        }
+        //front side
+        else if (normalVector.equals(new THREE.Vector3(0, 0, 1))){
+            if (texture === arrowUpTexture){
+                if (cubiePosition.x < 0){
+                    moveLi();
+                }
+                else if (cubiePosition.x === 0){
+                    moveMi();
+                }
+                else if (cubiePosition.x > 0){
+                    moveR();
+                }
+            }
+            else if (texture === arrowRightTexture){
+                if (cubiePosition.y < 0){
+                    moveD();
+                }
+                else if (cubiePosition.y === 0){
+                    moveE();
+                }
+                else if (cubiePosition.y > 0){
+                    moveUi();
+                }
+            }
+            else if (texture === arrowDownTexture){
+                if (cubiePosition.x < 0){
+                    moveL();
+                }
+                else if (cubiePosition.x === 0){
+                    moveM();
+                }
+                else if (cubiePosition.x > 0){
+                    moveRi();
+                }
+            }
+            else if (texture === arrowLeftTexture){
+                if (cubiePosition.y < 0){
+                    moveDi();
+                }
+                else if (cubiePosition.y === 0){
+                    moveEi();
+                }
+                else if (cubiePosition.y > 0){
+                    moveU();
+                }
+            }
+        }
+        //back side
+        else if (normalVector.equals(new THREE.Vector3(0, 0, -1))){
+            if (texture === arrowUpTexture){
+                if (cubiePosition.x < 0){
+                    moveL();
+                }
+                else if (cubiePosition.x === 0){
+                    moveM();
+                }
+                else if (cubiePosition.x > 0){
+                    moveRi();
+                }
+            }
+            else if (texture === arrowRightTexture){
+                if (cubiePosition.y < 0){
+                    moveD();
+                }
+                else if (cubiePosition.y === 0){
+                    moveE();
+                }
+                else if (cubiePosition.y > 0){
+                    moveUi();
+                }
+            }
+            else if (texture === arrowDownTexture){
+                if (cubiePosition.x < 0){
+                    moveLi();
+                }
+                else if (cubiePosition.x === 0){
+                    moveMi();
+                }
+                else if (cubiePosition.x > 0){
+                    moveR();
+                }
+            }
+            else if (texture === arrowLeftTexture){
+                if (cubiePosition.y < 0){
+                    moveDi();
+                }
+                else if (cubiePosition.y === 0){
+                    moveEi();
+                }
+                else if (cubiePosition.y > 0){
+                    moveU();
+                }
+            } 
         }
     }
+
     //color order: right, left, top, bottom, front, back
     return(
         <group
@@ -371,6 +640,61 @@ const colors =
 //track each cubie's position and current turn
 //used as a reference for each cubie's useFrame
 const currentTurn = [];
+
+function moveR(){
+    
+}
+function moveRi(){
+    console.log('Ri')
+}
+function moveL(){
+    console.log('L')
+}
+function moveLi(){
+    console.log('Li')
+}
+function moveF(){
+
+}
+function moveFi(){
+
+}
+function moveB(){
+
+}
+function moveBi(){
+
+}
+function moveU(){
+
+}
+function moveUi(){
+
+}
+function moveD(){
+
+}
+function moveDi(){
+
+}
+function moveM(){
+
+}
+function moveMi(){
+
+}
+function moveS(){
+
+}
+function moveSi(){
+
+}
+function moveE(){
+
+}
+function moveEi(){
+
+}
 
 //orbit controls
 function CameraController() {
