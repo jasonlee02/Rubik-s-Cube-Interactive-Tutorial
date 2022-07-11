@@ -50,6 +50,7 @@ const mouseVector = new THREE.Vector2();
 
 let normalVector = new THREE.Vector3();
 let faceIndex = -1;
+let point = 0;
 
 const vup = new THREE.Vector3(0, 1, 0);
 const vdown = new THREE.Vector3(0, -1, 0);
@@ -61,10 +62,10 @@ const vback = new THREE.Vector3(0, 0, -1);
 function Cubie(props){
     const index = props.cubieNum;
     const group = React.useRef();
-    let originalRotationX = useRef();
-    let originalRotationY = useRef();
-    let originalRotationZ = useRef();
-    let currentRotation = useRef();
+    let originalRotationX = useRef(0);
+    let originalRotationY = useRef(0);
+    let originalRotationZ = useRef(0);
+    let currentRotation = 0;
 
     useFrame(() => {
         //get index to find the current turn
@@ -75,73 +76,73 @@ function Cubie(props){
                 group.current.rotation.x += rotationSpeed;
                 //when turn is complete, reset the current rotation and tell currentTurn that the cubie is no longer turning 
                 if (currentRotation >= Math.PI / 2){
-                    currentRotation.current = 0;
+                    currentRotation = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.x = (Math.PI / 2) + originalRotationX;
+                    group.current.rotation.x = (Math.PI / 2) + originalRotationX.current;
                     originalRotationX.current = group.current.rotation.x;
                 }
                 else{
-                    currentRotation.current += rotationSpeed;
+                    currentRotation += rotationSpeed;
                 }
                 break;
             case 2:
                 group.current.rotation.x -= rotationSpeed; 
-                if (currentRotation >= Math.PI / 2){
-                    currentRotation.current = 0;
+                if (currentRotation>= Math.PI / 2){
+                    currentRotation = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.x = -(Math.PI / 2) + originalRotationX;
+                    group.current.rotation.x = -(Math.PI / 2) + originalRotationX.current;
                     originalRotationX.current = group.current.rotation.x;
                 }
                 else{
-                    currentRotation.current += rotationSpeed;
+                    currentRotation += rotationSpeed;
                 }
                 break;
             case 3:
                 group.current.rotation.y += rotationSpeed;
                 if (currentRotation >= Math.PI / 2){
-                    currentRotation.current = 0;
+                    currentRotation = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.y = (Math.PI / 2) + originalRotationY;
+                    group.current.rotation.y = (Math.PI / 2) + originalRotationY.current;
                     originalRotationY.current = group.current.rotation.y;
                 }
                 else{
-                    currentRotation.current += rotationSpeed;
+                    currentRotation += rotationSpeed;
                 }
                 break;
             case 4:
                 group.current.rotation.y -= rotationSpeed;
                 if (currentRotation >= Math.PI / 2){
-                    currentRotation.current = 0;
+                    currentRotation = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.y = -(Math.PI / 2) + originalRotationY;
+                    group.current.rotation.y = -(Math.PI / 2) + originalRotationY.current;
                     originalRotationY.current = group.current.rotation.y;
                 }
                 else{
-                    currentRotation.current += rotationSpeed;
+                    currentRotation += rotationSpeed;
                 }
                 break;
             case 5:
                 group.current.rotation.z += rotationSpeed;
                 if (currentRotation >= Math.PI / 2){
-                    currentRotation.current = 0;
+                    currentRotation = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.z = (Math.PI / 2) + originalRotationZ;
+                    group.current.rotation.z = (Math.PI / 2) + originalRotationZ.current;
                     originalRotationZ.current = group.current.rotation.z;
                 }
                 else{
-                    currentRotation.current += rotationSpeed;
+                    currentRotation += rotationSpeed;
                 }
                 break;
             case 6:
                 group.current.rotation.z -= rotationSpeed;
                 if (currentRotation >= Math.PI / 2){
-                    currentRotation.current = 0;
+                    currentRotation  = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.z = -(Math.PI / 2) + originalRotationZ;
+                    group.current.rotation.z = -(Math.PI / 2) + originalRotationZ.current;
                     originalRotationZ.current = group.current.rotation.z;
                 }
                 else{
-                    currentRotation.current += rotationSpeed;
+                    currentRotation += rotationSpeed;
                 }
                 break;
             default: 
@@ -153,7 +154,7 @@ function Cubie(props){
     const cubie = React.useRef();
 
     //order: up, right, down, left
-    const localVectors = 
+    const localVectors = useRef(
         [
             [vup.clone(), vback.clone(), vdown.clone(), vfront.clone()], //right
             [vup.clone(), vfront.clone(), vdown.clone(), vback.clone()], //left
@@ -162,6 +163,7 @@ function Cubie(props){
             [vup.clone(), vright.clone(), vdown.clone(), vleft.clone()], //front
             [vup.clone(), vleft.clone(), vdown.clone(), vright.clone()] //back
         ]
+    );
 
     const vectorLocalUp = useRef(new THREE.Vector3());
     const vectorLocalRight = useRef(new THREE.Vector3());
@@ -182,10 +184,13 @@ function Cubie(props){
                 var intersect = raycaster.intersectObject(cubie.current, true);
                 
                 faceIndex = Math.floor(intersect[0].faceIndex / 2);  
-                vectorLocalUp.current = localVectors[faceIndex][0];
-                vectorLocalRight.current = localVectors[faceIndex][1];
-                vectorLocalDown.current = localVectors[faceIndex][2];
-                vectorLocalLeft.current = localVectors[faceIndex][3];
+                vectorLocalUp.current = localVectors.current[faceIndex][0];
+                vectorLocalRight.current = localVectors.current[faceIndex][1];
+                vectorLocalDown.current = localVectors.current[faceIndex][2];
+                vectorLocalLeft.current = localVectors.current[faceIndex][3];
+
+                point = intersect[0].point;
+                console.log(point)
 
                 let temp = vectorLocalUp.current;
                 temp.project(camera);
@@ -239,14 +244,10 @@ function Cubie(props){
 
     function showDirection(x, y){
         mouseVector.set(x, y);
-        let temp = vectorLocalUp2d.current;
-        let angToUp = Math.abs(mouseVector.angle() - temp.angle());
-        temp = vectorLocalRight2d.current;
-        let angToRight = Math.abs(mouseVector.angle() - temp.angle());
-        temp = vectorLocalDown2d.current;
-        let angToDown = Math.abs(mouseVector.angle() - temp.angle());
-        temp = vectorLocalLeft2d.current;
-        let angToLeft = Math.abs(mouseVector.angle() - temp.angle());
+        let angToUp = Math.abs(mouseVector.angle() - vectorLocalUp2d.current.angle());
+        let angToRight = Math.abs(mouseVector.angle() - vectorLocalRight2d.current.angle());
+        let angToDown = Math.abs(mouseVector.angle() - vectorLocalDown2d.current.angle());
+        let angToLeft = Math.abs(mouseVector.angle() - vectorLocalLeft2d.current.angle());
         
 
         while (angToUp > (Math.PI * 2)){
@@ -297,8 +298,21 @@ function Cubie(props){
 
     function doTurn(x, y){
         const cubiePosition = cubie.current.position;
+        let v;
+        if (texture === arrowUpTexture){
+            v = vectorLocalUp;
+        }
+        else if (texture === arrowRightTexture){
+            v = vectorLocalRight;
+        }
+        else if (texture === arrowDownTexture){
+            v = vectorLocalDown;
+        }
+        else if (texture === arrowLeftTexture){
+            v = vectorLocalLeft;
+        }
         //right side
-        if (normalVector.equals(new THREE.Vector3(1, 0, 0))){
+        if (point.x >= 1.5499 && point.x <= 1.5501){
             if (texture === arrowUpTexture){
                 if (cubiePosition.z < 0){
                     moveB();
@@ -486,7 +500,7 @@ function Cubie(props){
             }
         }
         //front side
-        else if (normalVector.equals(new THREE.Vector3(0, 0, 1))){
+        else if (point.z >= 1.5499 && point.z <= 1.5501){
             if (texture === arrowUpTexture){
                 if (cubiePosition.x < 0){
                     moveLi();
