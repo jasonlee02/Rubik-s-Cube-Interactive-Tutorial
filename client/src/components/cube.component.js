@@ -48,7 +48,6 @@ const raycaster = new THREE.Raycaster();
 let pointer = new THREE.Vector2();
 const mouseVector = new THREE.Vector2();
 
-let normalVector = new THREE.Vector3();
 let faceIndex = -1;
 let point = 0;
 
@@ -65,7 +64,7 @@ function Cubie(props){
     let originalRotationX = useRef(0);
     let originalRotationY = useRef(0);
     let originalRotationZ = useRef(0);
-    let currentRotation = 0;
+    let currentRotation = useRef(0);
 
     useFrame(() => {
         //get index to find the current turn
@@ -75,74 +74,74 @@ function Cubie(props){
             case 1:
                 group.current.rotation.x += rotationSpeed;
                 //when turn is complete, reset the current rotation and tell currentTurn that the cubie is no longer turning 
-                if (currentRotation >= Math.PI / 2){
-                    currentRotation = 0;
+                if (currentRotation.current >= Math.PI / 2){
+                    currentRotation.current = 0;
                     currentTurn[index][1] = 0;
                     group.current.rotation.x = (Math.PI / 2) + originalRotationX.current;
                     originalRotationX.current = group.current.rotation.x;
                 }
                 else{
-                    currentRotation += rotationSpeed;
+                    currentRotation.current += rotationSpeed;
                 }
                 break;
             case 2:
                 group.current.rotation.x -= rotationSpeed; 
-                if (currentRotation>= Math.PI / 2){
-                    currentRotation = 0;
+                if (currentRotation.current >= Math.PI / 2){
+                    currentRotation.current = 0;
                     currentTurn[index][1] = 0;
                     group.current.rotation.x = -(Math.PI / 2) + originalRotationX.current;
                     originalRotationX.current = group.current.rotation.x;
                 }
                 else{
-                    currentRotation += rotationSpeed;
+                    currentRotation.current += rotationSpeed;
                 }
                 break;
             case 3:
                 group.current.rotation.y += rotationSpeed;
-                if (currentRotation >= Math.PI / 2){
-                    currentRotation = 0;
+                if (currentRotation.current >= Math.PI / 2){
+                    currentRotation.current = 0;
                     currentTurn[index][1] = 0;
                     group.current.rotation.y = (Math.PI / 2) + originalRotationY.current;
                     originalRotationY.current = group.current.rotation.y;
                 }
                 else{
-                    currentRotation += rotationSpeed;
+                    currentRotation.current += rotationSpeed;
                 }
                 break;
             case 4:
                 group.current.rotation.y -= rotationSpeed;
-                if (currentRotation >= Math.PI / 2){
-                    currentRotation = 0;
+                if (currentRotation.current >= Math.PI / 2){
+                    currentRotation.current = 0;
                     currentTurn[index][1] = 0;
                     group.current.rotation.y = -(Math.PI / 2) + originalRotationY.current;
                     originalRotationY.current = group.current.rotation.y;
                 }
                 else{
-                    currentRotation += rotationSpeed;
+                    currentRotation.current += rotationSpeed;
                 }
                 break;
             case 5:
                 group.current.rotation.z += rotationSpeed;
-                if (currentRotation >= Math.PI / 2){
-                    currentRotation = 0;
+                if (currentRotation.current >= Math.PI / 2){
+                    currentRotation.current = 0;
                     currentTurn[index][1] = 0;
                     group.current.rotation.z = (Math.PI / 2) + originalRotationZ.current;
                     originalRotationZ.current = group.current.rotation.z;
                 }
                 else{
-                    currentRotation += rotationSpeed;
+                    currentRotation.current += rotationSpeed;
                 }
                 break;
             case 6:
                 group.current.rotation.z -= rotationSpeed;
-                if (currentRotation >= Math.PI / 2){
-                    currentRotation  = 0;
+                if (currentRotation.current >= Math.PI / 2){
+                    currentRotation.current  = 0;
                     currentTurn[index][1] = 0;
                     group.current.rotation.z = -(Math.PI / 2) + originalRotationZ.current;
                     originalRotationZ.current = group.current.rotation.z;
                 }
                 else{
-                    currentRotation += rotationSpeed;
+                    currentRotation.current += rotationSpeed;
                 }
                 break;
             default: 
@@ -177,6 +176,7 @@ function Cubie(props){
     const bind = useGesture(
         {
             onDragStart: ({initial: [x, y]}) => {
+
                 //ndc = normalized device coordinates
                 pointer.x = (( x - window.innerWidth * 0.05) / (window.innerWidth * .4) ) * 2 - 1;
                 pointer.y = - ( (y - window.innerHeight * 0.25) / (window.innerHeight * .5) ) * 2 + 1;
@@ -190,23 +190,34 @@ function Cubie(props){
                 vectorLocalLeft.current = localVectors.current[faceIndex][3];
 
                 point = intersect[0].point;
-                console.log(point)
 
-                let temp = vectorLocalUp.current;
-                temp.project(camera);
-                vectorLocalUp2d.current.set(temp.x * window.innerWidth * 0.4, -temp.y * window.innerHeight * 0.5);
+                vectorLocalUp.current.project(camera);
+                vectorLocalUp2d.current.set(vectorLocalUp.current.x * window.innerWidth * 0.4, -vectorLocalUp.current.y * window.innerHeight * 0.5);
+                vectorLocalUp.current.unproject(camera);
+                vectorLocalUp.current.x = Math.round(vectorLocalUp.current.x);
+                vectorLocalUp.current.y = Math.round(vectorLocalUp.current.y);
+                vectorLocalUp.current.z = Math.round(vectorLocalUp.current.z);
 
-                temp = vectorLocalRight.current;
-                temp.project(camera)
-                vectorLocalRight2d.current.set(temp.x * window.innerWidth * 0.4, -temp.y * window.innerHeight * 0.5);
+                vectorLocalRight.current.project(camera);
+                vectorLocalRight2d.current.set(vectorLocalRight.current.x * window.innerWidth * 0.4, -vectorLocalRight.current.y * window.innerHeight * 0.5);
+                vectorLocalRight.current.unproject(camera);
+                vectorLocalRight.current.x = Math.round(vectorLocalRight.current.x);
+                vectorLocalRight.current.y = Math.round(vectorLocalRight.current.y);
+                vectorLocalRight.current.z = Math.round(vectorLocalRight.current.z);
 
-                temp = vectorLocalDown.current;
-                temp.project(camera)
-                vectorLocalDown2d.current.set(temp.x * window.innerWidth * 0.4, -temp.y * window.innerHeight * 0.5);
+                vectorLocalDown.current.project(camera);
+                vectorLocalDown2d.current.set(vectorLocalDown.current.x * window.innerWidth * 0.4, -vectorLocalDown.current.y * window.innerHeight * 0.5);
+                vectorLocalDown.current.unproject(camera);
+                vectorLocalDown.current.x = Math.round(vectorLocalDown.current.x);
+                vectorLocalDown.current.y = Math.round(vectorLocalDown.current.y);
+                vectorLocalDown.current.z = Math.round(vectorLocalDown.current.z);
 
-                temp = vectorLocalLeft.current;
-                temp.project(camera)
-                vectorLocalLeft2d.current.set(temp.x * window.innerWidth * 0.4, -temp.y * window.innerHeight * 0.5);
+                vectorLocalLeft.current.project(camera);
+                vectorLocalLeft2d.current.set(vectorLocalLeft.current.x * window.innerWidth * 0.4, -vectorLocalLeft.current.y * window.innerHeight * 0.5);
+                vectorLocalLeft.current.unproject(camera);
+                vectorLocalLeft.current.x = Math.round(vectorLocalLeft.current.x);
+                vectorLocalLeft.current.y = Math.round(vectorLocalLeft.current.y);
+                vectorLocalLeft.current.z = Math.round(vectorLocalLeft.current.z);
             },
 
             onDrag: ({event, movement: [x, y]}) => {
@@ -215,7 +226,7 @@ function Cubie(props){
             },
 
             onDragEnd: ({event, movement: [x, y]}) => {
-                event.stopPropagation();
+                event.stopPropagation();  
                 doTurn(x, y);
                 setmap0(blankTexture);
                 setmap1(blankTexture);
@@ -300,22 +311,25 @@ function Cubie(props){
         const cubiePosition = cubie.current.position;
         let v;
         if (texture === arrowUpTexture){
-            v = vectorLocalUp;
+            v = vectorLocalUp.current;
         }
         else if (texture === arrowRightTexture){
-            v = vectorLocalRight;
+            v = vectorLocalRight.current;
         }
         else if (texture === arrowDownTexture){
-            v = vectorLocalDown;
+            v = vectorLocalDown.current;
         }
         else if (texture === arrowLeftTexture){
-            v = vectorLocalLeft;
+            v = vectorLocalLeft.current;
         }
         //right side
         if (point.x >= 1.5499 && point.x <= 1.5501){
-            if (texture === arrowUpTexture){
+            if (v.equals(vup)){
                 if (cubiePosition.z < 0){
                     moveB();
+                    //update local vectors in here
+                    //update currentTurn position matrix 
+                        //use math.round
                 }
                 else if (cubiePosition.z === 0){
                     moveS();
@@ -324,7 +338,7 @@ function Cubie(props){
                     moveFi()
                 }
             }
-            else if (texture === arrowRightTexture){
+            else if (v.equals(vback)){
                 if (cubiePosition.y < 0){
                     moveD();
                 }
@@ -335,7 +349,7 @@ function Cubie(props){
                     moveUi();
                 }
             }
-            else if (texture === arrowDownTexture){
+            else if (v.equals(vdown)){
                 if (cubiePosition.z < 0){
                     moveBi();
                 }
@@ -346,7 +360,7 @@ function Cubie(props){
                     moveF()
                 }
             }
-            else if (texture === arrowLeftTexture){
+            else if (v.equals(vfront)){
                 if (cubiePosition.y < 0){
                     moveDi();
                 }
@@ -359,8 +373,8 @@ function Cubie(props){
             }
         }
         //left side
-        else if (normalVector.equals(new THREE.Vector3(-1, 0, 0))){
-            if (texture === arrowUpTexture){
+        else if (point.x >= -1.5501 && point.x <= -1.5499){
+            if (v.equals(vup)){
                 if (cubiePosition.z < 0){
                     moveBi();
                 }
@@ -371,7 +385,7 @@ function Cubie(props){
                     moveF()
                 }
             }
-            else if (texture === arrowRightTexture){
+            else if (v.equals(vfront)){
                 if (cubiePosition.y < 0){
                     moveD();
                 }
@@ -382,7 +396,7 @@ function Cubie(props){
                     moveUi();
                 }
             }
-            else if (texture === arrowDownTexture){
+            else if (v.equals(vdown)){
                 if (cubiePosition.z < 0){
                     moveB();
                 }
@@ -393,7 +407,7 @@ function Cubie(props){
                     moveFi()
                 }
             }
-            else if (texture === arrowLeftTexture){
+            else if (v.equals(vback)){
                 if (cubiePosition.y < 0){
                     moveDi();
                 }
@@ -406,8 +420,8 @@ function Cubie(props){
             }
         }
         //top side
-        else if (normalVector.equals(new THREE.Vector3(0, 1, 0))){
-            if (texture === arrowUpTexture){
+        else if (point.y >= 1.5499 && point.y <= 1.5501){
+            if (v.equals(vback)){
                 if (cubiePosition.x < 0){
                     moveLi();
                 }
@@ -418,7 +432,7 @@ function Cubie(props){
                     moveR();
                 }
             }
-            else if (texture === arrowRightTexture){
+            else if (v.equals(vright)){
                 if (cubiePosition.z < 0){
                     moveBi();
                 }
@@ -429,7 +443,7 @@ function Cubie(props){
                     moveF()
                 }
             }
-            else if (texture === arrowDownTexture){
+            else if (v.equals(vfront)){
                 if (cubiePosition.x < 0){
                     moveL();
                 }
@@ -440,7 +454,7 @@ function Cubie(props){
                     moveRi();
                 }
             }
-            else if (texture === arrowLeftTexture){
+            else if (v.equals(vleft)){
                 if (cubiePosition.z < 0){
                     moveB();
                 }
@@ -453,8 +467,8 @@ function Cubie(props){
             }
         }
         //down side
-        else if (normalVector.equals(new THREE.Vector3(0, -1, 0))){
-            if (texture === arrowUpTexture){
+        else if (point.y >= -1.5501 && point.y <= -1.5499){
+            if (v.equals(vfront)){
                 if (cubiePosition.x < 0){
                     moveLi();
                 }
@@ -465,7 +479,7 @@ function Cubie(props){
                     moveR();
                 }
             }
-            else if (texture === arrowRightTexture){
+            else if (v.equals(vright)){
                 if (cubiePosition.z < 0){
                     moveB();
                 }
@@ -476,7 +490,7 @@ function Cubie(props){
                     moveFi()
                 }
             }
-            else if (texture === arrowDownTexture){
+            else if (v.equals(vback)){
                 if (cubiePosition.x < 0){
                     moveL();
                 }
@@ -487,7 +501,7 @@ function Cubie(props){
                     moveRi();
                 }
             }
-            else if (texture === arrowLeftTexture){
+            else if (v.equals(vleft)){
                 if (cubiePosition.z < 0){
                     moveBi();
                 }
@@ -501,7 +515,7 @@ function Cubie(props){
         }
         //front side
         else if (point.z >= 1.5499 && point.z <= 1.5501){
-            if (texture === arrowUpTexture){
+            if (v.equals(vup)){
                 if (cubiePosition.x < 0){
                     moveLi();
                 }
@@ -512,7 +526,7 @@ function Cubie(props){
                     moveR();
                 }
             }
-            else if (texture === arrowRightTexture){
+            else if (v.equals(vright)){
                 if (cubiePosition.y < 0){
                     moveD();
                 }
@@ -523,7 +537,7 @@ function Cubie(props){
                     moveUi();
                 }
             }
-            else if (texture === arrowDownTexture){
+            else if (v.equals(vdown)){
                 if (cubiePosition.x < 0){
                     moveL();
                 }
@@ -534,7 +548,7 @@ function Cubie(props){
                     moveRi();
                 }
             }
-            else if (texture === arrowLeftTexture){
+            else if (v.equals(vleft)){
                 if (cubiePosition.y < 0){
                     moveDi();
                 }
@@ -547,8 +561,8 @@ function Cubie(props){
             }
         }
         //back side
-        else if (normalVector.equals(new THREE.Vector3(0, 0, -1))){
-            if (texture === arrowUpTexture){
+        else if (point.z >= -1.5501 && point.z <= -1.5499){
+            if (v.equals(vup)){
                 if (cubiePosition.x < 0){
                     moveL();
                 }
@@ -559,7 +573,7 @@ function Cubie(props){
                     moveRi();
                 }
             }
-            else if (texture === arrowRightTexture){
+            else if (v.equals(vleft)){
                 if (cubiePosition.y < 0){
                     moveD();
                 }
@@ -570,7 +584,7 @@ function Cubie(props){
                     moveUi();
                 }
             }
-            else if (texture === arrowDownTexture){
+            else if (v.equals(vdown)){
                 if (cubiePosition.x < 0){
                     moveLi();
                 }
@@ -581,7 +595,7 @@ function Cubie(props){
                     moveR();
                 }
             }
-            else if (texture === arrowLeftTexture){
+            else if (v.equals(vright)){
                 if (cubiePosition.y < 0){
                     moveDi();
                 }
@@ -638,63 +652,123 @@ function moveR(){
     }
 }
 function moveRi(){
-    
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][0] === 1){
+            currentTurn[i][1] = 1;
+        }
+    }
 }
 function moveL(){
-    
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][0] === -1){
+            currentTurn[i][1] = 1;
+        }
+    }
 }
 function moveLi(){
-    
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][0] === -1){
+            currentTurn[i][1] = 2;
+        }
+    }
 }
 function moveF(){
     for (let i = 0; i < currentTurn.length; i++){
         if (currentTurn[i][0][2] === 1){
-
+            currentTurn[i][1] = 6;
         }
     }
 }
 function moveFi(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][2] === 1){
+            currentTurn[i][1] = 5;
+        }
+    }
 }
 function moveB(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][2] === -1){
+            currentTurn[i][1] = 5;
+        }
+    }
 }
 function moveBi(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][2] === -1){
+            currentTurn[i][1] = 6;
+        }
+    }
 }
 function moveU(){
     for (let i = 0; i < currentTurn.length; i++){
         if (currentTurn[i][0][1] === 1){
-
+            currentTurn[i][1] = 4;
         }
     }
 }
 function moveUi(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][1] === 1){
+            currentTurn[i][1] = 3;
+        }
+    }
 }
 function moveD(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][1] === -1){
+            currentTurn[i][1] = 3;
+        }
+    }
 }
 function moveDi(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][1] === -1){
+            currentTurn[i][1] = 4;
+        }
+    }
 }
 function moveM(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][0] === 0){
+            currentTurn[i][1] = 1;
+        }
+    }
 }
 function moveMi(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][0] === 0){
+            currentTurn[i][1] = 2;
+        }
+    }
 }
 function moveS(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][2] === 0){
+            currentTurn[i][1] = 5;
+        }
+    }
 }
 function moveSi(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][2] === 0){
+            currentTurn[i][1] = 6;
+        }
+    }
 }
 function moveE(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][1] === 0){
+            currentTurn[i][1] = 3;
+        }
+    }
 }
 function moveEi(){
-
+    for (let i = 0; i < currentTurn.length; i++){
+        if (currentTurn[i][0][1] === 0){
+            currentTurn[i][1] = 4;
+        }
+    }
 }
 
 //orbit controls
