@@ -60,7 +60,7 @@ const vback = new THREE.Vector3(0, 0, -1);
 
 function Cubie(props){
     const index = props.cubieNum;
-    const group = React.useRef();
+    const group = useRef(null);
     let originalRotationX = useRef(0);
     let originalRotationY = useRef(0);
     let originalRotationZ = useRef(0);
@@ -87,9 +87,11 @@ function Cubie(props){
                             localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
                         }
                     }
-                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
-                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
-                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
+                    let position = new THREE.Vector3();
+                    cubie.current.getWorldPosition(position);
+                    currentTurn[index][0][0] = Math.round(position.x);
+                    currentTurn[index][0][1] = Math.round(position.y);
+                    currentTurn[index][0][2] = Math.round(position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
@@ -110,9 +112,11 @@ function Cubie(props){
                             localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
                         }
                     }
-                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
-                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
-                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
+                    let position = new THREE.Vector3();
+                    cubie.current.getWorldPosition(position);
+                    currentTurn[index][0][0] = Math.round(position.x);
+                    currentTurn[index][0][1] = Math.round(position.y);
+                    currentTurn[index][0][2] = Math.round(position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
@@ -133,9 +137,11 @@ function Cubie(props){
                             localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
                         }
                     }
-                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
-                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
-                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
+                    let position = new THREE.Vector3();
+                    cubie.current.getWorldPosition(position);
+                    currentTurn[index][0][0] = Math.round(position.x);
+                    currentTurn[index][0][1] = Math.round(position.y);
+                    currentTurn[index][0][2] = Math.round(position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
@@ -156,9 +162,11 @@ function Cubie(props){
                             localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
                         }
                     }
-                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
-                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
-                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
+                    let position = new THREE.Vector3();
+                    cubie.current.getWorldPosition(position);
+                    currentTurn[index][0][0] = Math.round(position.x);
+                    currentTurn[index][0][1] = Math.round(position.y);
+                    currentTurn[index][0][2] = Math.round(position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
@@ -179,9 +187,11 @@ function Cubie(props){
                             localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
                         }
                     }
-                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
-                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
-                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
+                    let position = new THREE.Vector3();
+                    cubie.current.getWorldPosition(position);
+                    currentTurn[index][0][0] = Math.round(position.x);
+                    currentTurn[index][0][1] = Math.round(position.y);
+                    currentTurn[index][0][2] = Math.round(position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
@@ -202,21 +212,23 @@ function Cubie(props){
                             localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
                         }
                     }
-                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
-                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
-                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
+                    let position = new THREE.Vector3();
+                    cubie.current.getWorldPosition(position);
+                    currentTurn[index][0][0] = Math.round(position.x);
+                    currentTurn[index][0][1] = Math.round(position.y);
+                    currentTurn[index][0][2] = Math.round(position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
                 }
                 break;
             default: 
-                break;
+                break; 
         }
     })
 
     const camera = useThree((state) => state.camera);
-    const cubie = React.useRef();
+    const cubie = useRef(null);
 
     //order: up, right, down, left
     const localVectors = useRef(
@@ -373,7 +385,11 @@ function Cubie(props){
     } 
 
     function doTurn(x, y){
-        const cubiePosition = cubie.current.position;
+        let cubiePosition = new THREE.Vector3();
+        cubie.current.getWorldPosition(cubiePosition);
+        cubiePosition.x = Math.round(cubiePosition.x);
+        cubiePosition.x = Math.round(cubiePosition.y);
+        cubiePosition.x = Math.round(cubiePosition.z);
         let v;
         if (texture === arrowUpTexture){
             v = vectorLocalUp.current;
@@ -770,7 +786,7 @@ function moveU(){
         if (currentTurn[i][0][1] === 1){
             currentTurn[i][1] = 4;
         }
-    }
+    } 
 }
 function moveUi(){
     for (let i = 0; i < currentTurn.length; i++){
