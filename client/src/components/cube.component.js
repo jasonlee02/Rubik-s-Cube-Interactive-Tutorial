@@ -79,6 +79,17 @@ function Cubie(props){
                     currentTurn[index][1] = 0;
                     group.current.rotation.x = (Math.PI / 2) + originalRotationX.current;
                     originalRotationX.current = group.current.rotation.x;
+                    for (let i = 0; i < localVectors.current.length; i++){
+                        for (let j = 0; j < localVectors.current[i].length; j++){
+                            localVectors.current[i][j].applyAxisAngle(vright, Math.PI / 2);
+                            localVectors.current[i][j].x = Math.round(localVectors.current[i][j].x);
+                            localVectors.current[i][j].y = Math.round(localVectors.current[i][j].y);
+                            localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
+                        }
+                    }
+                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
+                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
+                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
@@ -91,6 +102,17 @@ function Cubie(props){
                     currentTurn[index][1] = 0;
                     group.current.rotation.x = -(Math.PI / 2) + originalRotationX.current;
                     originalRotationX.current = group.current.rotation.x;
+                    for (let i = 0; i < localVectors.current.length; i++){
+                        for (let j = 0; j < localVectors.current[i].length; j++){
+                            localVectors.current[i][j].applyAxisAngle(vright, -Math.PI / 2);
+                            localVectors.current[i][j].x = Math.round(localVectors.current[i][j].x);
+                            localVectors.current[i][j].y = Math.round(localVectors.current[i][j].y);
+                            localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
+                        }
+                    }
+                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
+                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
+                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
@@ -103,6 +125,17 @@ function Cubie(props){
                     currentTurn[index][1] = 0;
                     group.current.rotation.y = (Math.PI / 2) + originalRotationY.current;
                     originalRotationY.current = group.current.rotation.y;
+                    for (let i = 0; i < localVectors.current.length; i++){
+                        for (let j = 0; j < localVectors.current[i].length; j++){
+                            localVectors.current[i][j].applyAxisAngle(vup, Math.PI / 2);
+                            localVectors.current[i][j].x = Math.round(localVectors.current[i][j].x);
+                            localVectors.current[i][j].y = Math.round(localVectors.current[i][j].y);
+                            localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
+                        }
+                    }
+                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
+                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
+                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
@@ -115,6 +148,17 @@ function Cubie(props){
                     currentTurn[index][1] = 0;
                     group.current.rotation.y = -(Math.PI / 2) + originalRotationY.current;
                     originalRotationY.current = group.current.rotation.y;
+                    for (let i = 0; i < localVectors.current.length; i++){
+                        for (let j = 0; j < localVectors.current[i].length; j++){
+                            localVectors.current[i][j].applyAxisAngle(vup, -Math.PI / 2);
+                            localVectors.current[i][j].x = Math.round(localVectors.current[i][j].x);
+                            localVectors.current[i][j].y = Math.round(localVectors.current[i][j].y);
+                            localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
+                        }
+                    }
+                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
+                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
+                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
@@ -127,6 +171,17 @@ function Cubie(props){
                     currentTurn[index][1] = 0;
                     group.current.rotation.z = (Math.PI / 2) + originalRotationZ.current;
                     originalRotationZ.current = group.current.rotation.z;
+                    for (let i = 0; i < localVectors.current.length; i++){
+                        for (let j = 0; j < localVectors.current[i].length; j++){
+                            localVectors.current[i][j].applyAxisAngle(vfront, Math.PI / 2);
+                            localVectors.current[i][j].x = Math.round(localVectors.current[i][j].x);
+                            localVectors.current[i][j].y = Math.round(localVectors.current[i][j].y);
+                            localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
+                        }
+                    }
+                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
+                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
+                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
@@ -139,6 +194,17 @@ function Cubie(props){
                     currentTurn[index][1] = 0;
                     group.current.rotation.z = -(Math.PI / 2) + originalRotationZ.current;
                     originalRotationZ.current = group.current.rotation.z;
+                    for (let i = 0; i < localVectors.current.length; i++){
+                        for (let j = 0; j < localVectors.current[i].length; j++){
+                            localVectors.current[i][j].applyAxisAngle(vfront, -Math.PI / 2);
+                            localVectors.current[i][j].x = Math.round(localVectors.current[i][j].x);
+                            localVectors.current[i][j].y = Math.round(localVectors.current[i][j].y);
+                            localVectors.current[i][j].z = Math.round(localVectors.current[i][j].z);
+                        }
+                    }
+                    currentTurn[index][0][0] = Math.round(cubie.current.position.x);
+                    currentTurn[index][0][1] = Math.round(cubie.current.position.y);
+                    currentTurn[index][0][2] = Math.round(cubie.current.position.z);
                 }
                 else{
                     currentRotation.current += rotationSpeed;
@@ -176,7 +242,6 @@ function Cubie(props){
     const bind = useGesture(
         {
             onDragStart: ({initial: [x, y]}) => {
-
                 //ndc = normalized device coordinates
                 pointer.x = (( x - window.innerWidth * 0.05) / (window.innerWidth * .4) ) * 2 - 1;
                 pointer.y = - ( (y - window.innerHeight * 0.25) / (window.innerHeight * .5) ) * 2 + 1;
