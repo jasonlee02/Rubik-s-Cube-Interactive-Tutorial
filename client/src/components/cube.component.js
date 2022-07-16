@@ -398,8 +398,8 @@ function Cubie(props){
         let cubiePosition = new THREE.Vector3();
         cubie.current.getWorldPosition(cubiePosition);
         cubiePosition.x = Math.round(cubiePosition.x);
-        cubiePosition.x = Math.round(cubiePosition.y);
-        cubiePosition.x = Math.round(cubiePosition.z);
+        cubiePosition.y = Math.round(cubiePosition.y);
+        cubiePosition.z = Math.round(cubiePosition.z);
         let v;
         if (texture === arrowUpTexture){
             v = vectorLocalUp.current;
