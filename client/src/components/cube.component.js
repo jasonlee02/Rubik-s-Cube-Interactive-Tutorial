@@ -61,10 +61,8 @@ const vback = new THREE.Vector3(0, 0, -1);
 function Cubie(props){
     const index = props.cubieNum;
     const group = useRef(null);
-    let originalRotationX = useRef(0);
-    let originalRotationY = useRef(0);
-    let originalRotationZ = useRef(0);
-    let currentRotation = useRef(0);
+    const currentRotation = useRef(0);
+    const rotationTracker = useRef(new THREE.Object3D());
 
     useFrame(() => {
         //get index to find the current turn
@@ -72,13 +70,15 @@ function Cubie(props){
             case 0:
                 break;
             case 1:
-                group.current.rotation.x += rotationSpeed;
+                group.current.rotateOnWorldAxis(vright, rotationSpeed);
                 //when turn is complete, reset the current rotation and tell currentTurn that the cubie is no longer turning 
                 if (currentRotation.current >= Math.PI / 2){
-                    currentRotation.current = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.x = (Math.PI / 2) + originalRotationX.current;
-                    originalRotationX.current = group.current.rotation.x;
+                    currentRotation.current = 0;
+                    rotationTracker.current.rotateOnWorldAxis(vright, Math.PI / 2);
+                    let q = new THREE.Quaternion();
+                    rotationTracker.current.getWorldQuaternion(q);
+                    group.current.setRotationFromQuaternion(q);
                     for (let i = 0; i < localVectors.current.length; i++){
                         for (let j = 0; j < localVectors.current[i].length; j++){
                             localVectors.current[i][j].applyAxisAngle(vright, Math.PI / 2);
@@ -98,12 +98,14 @@ function Cubie(props){
                 }
                 break;
             case 2:
-                group.current.rotation.x -= rotationSpeed; 
+                group.current.rotateOnWorldAxis(vright, -rotationSpeed);
                 if (currentRotation.current >= Math.PI / 2){
-                    currentRotation.current = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.x = -(Math.PI / 2) + originalRotationX.current;
-                    originalRotationX.current = group.current.rotation.x;
+                    currentRotation.current = 0;
+                    rotationTracker.current.rotateOnWorldAxis(vright, -Math.PI / 2);
+                    let q = new THREE.Quaternion();
+                    rotationTracker.current.getWorldQuaternion(q);
+                    group.current.setRotationFromQuaternion(q);
                     for (let i = 0; i < localVectors.current.length; i++){
                         for (let j = 0; j < localVectors.current[i].length; j++){
                             localVectors.current[i][j].applyAxisAngle(vright, -Math.PI / 2);
@@ -123,12 +125,14 @@ function Cubie(props){
                 }
                 break;
             case 3:
-                group.current.rotation.y += rotationSpeed;
+                group.current.rotateOnWorldAxis(vup, rotationSpeed);
                 if (currentRotation.current >= Math.PI / 2){
-                    currentRotation.current = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.y = (Math.PI / 2) + originalRotationY.current;
-                    originalRotationY.current = group.current.rotation.y;
+                    currentRotation.current = 0;
+                    rotationTracker.current.rotateOnWorldAxis(vup, Math.PI / 2);
+                    let q = new THREE.Quaternion();
+                    rotationTracker.current.getWorldQuaternion(q);
+                    group.current.setRotationFromQuaternion(q);
                     for (let i = 0; i < localVectors.current.length; i++){
                         for (let j = 0; j < localVectors.current[i].length; j++){
                             localVectors.current[i][j].applyAxisAngle(vup, Math.PI / 2);
@@ -148,12 +152,14 @@ function Cubie(props){
                 }
                 break;
             case 4:
-                group.current.rotation.y -= rotationSpeed;
+                group.current.rotateOnWorldAxis(vup, -rotationSpeed);
                 if (currentRotation.current >= Math.PI / 2){
-                    currentRotation.current = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.y = -(Math.PI / 2) + originalRotationY.current;
-                    originalRotationY.current = group.current.rotation.y;
+                    currentRotation.current = 0;
+                    rotationTracker.current.rotateOnWorldAxis(vup, -Math.PI / 2);
+                    let q = new THREE.Quaternion();
+                    rotationTracker.current.getWorldQuaternion(q);
+                    group.current.setRotationFromQuaternion(q);
                     for (let i = 0; i < localVectors.current.length; i++){
                         for (let j = 0; j < localVectors.current[i].length; j++){
                             localVectors.current[i][j].applyAxisAngle(vup, -Math.PI / 2);
@@ -173,12 +179,14 @@ function Cubie(props){
                 }
                 break;
             case 5:
-                group.current.rotation.z += rotationSpeed;
+                group.current.rotateOnWorldAxis(vfront, rotationSpeed);
                 if (currentRotation.current >= Math.PI / 2){
-                    currentRotation.current = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.z = (Math.PI / 2) + originalRotationZ.current;
-                    originalRotationZ.current = group.current.rotation.z;
+                    currentRotation.current = 0;
+                    rotationTracker.current.rotateOnWorldAxis(vfront, Math.PI / 2);
+                    let q = new THREE.Quaternion();
+                    rotationTracker.current.getWorldQuaternion(q);
+                    group.current.setRotationFromQuaternion(q);
                     for (let i = 0; i < localVectors.current.length; i++){
                         for (let j = 0; j < localVectors.current[i].length; j++){
                             localVectors.current[i][j].applyAxisAngle(vfront, Math.PI / 2);
@@ -198,12 +206,14 @@ function Cubie(props){
                 }
                 break;
             case 6:
-                group.current.rotation.z -= rotationSpeed;
+                group.current.rotateOnWorldAxis(vfront, -rotationSpeed);
                 if (currentRotation.current >= Math.PI / 2){
-                    currentRotation.current  = 0;
                     currentTurn[index][1] = 0;
-                    group.current.rotation.z = -(Math.PI / 2) + originalRotationZ.current;
-                    originalRotationZ.current = group.current.rotation.z;
+                    currentRotation.current = 0;
+                    rotationTracker.current.rotateOnWorldAxis(vfront, -Math.PI / 2);
+                    let q = new THREE.Quaternion();
+                    rotationTracker.current.getWorldQuaternion(q);
+                    group.current.setRotationFromQuaternion(q);
                     for (let i = 0; i < localVectors.current.length; i++){
                         for (let j = 0; j < localVectors.current[i].length; j++){
                             localVectors.current[i][j].applyAxisAngle(vfront, -Math.PI / 2);
